@@ -18,20 +18,28 @@
 
   </div>
   <div>
-    <h1>hello</h1>
+    <h1 id="clickMe">hello</h1>
+    <h1 id="clickMe2">hello</h1>
+    <svg height="600" width="600" mlns="http://www.w3.org/2000/svg" id="Canvas" style="float: left">
+      <rect id="mainBox" height="150" width="180" x="10" y="10" style="fill:#ff0066"></rect>
+      <rect id="mainBox" height="150" width="180" x="100" y="10" style="fill:#0000ff; opacity: 0.5"></rect>
+
+    </svg>
   </div>
 
 
 <script>
 
 let leftOpperand = {
-    numerator: Number(1),
-    denominator: Number(2)
+    numerator: Number(2),
+    denominator: Number(5),
+    colour: '#ff0066'
 };
 
 let rightOpperand = {
-    numerator: Number(1),
-    denominator: Number(4)
+    numerator: Number(3),
+    denominator: Number(5),
+    colour: '#0000ff'
 };
 
 let verticalDivide = function(xVal, lineNum) {
@@ -41,18 +49,16 @@ let verticalDivide = function(xVal, lineNum) {
       i += xVal;
       lineNum --;
     }
-}
+};
 
 let horizontalDivide = function(xVal, lineNum) {
     var i = Number(xVal);
     while(lineNum > 0){
-      // addLine(Number(i + 10), Number(i + 10), 10, Number(d3.select('#mainBox').attr('height')) + 10);
-
       addLine(10, Number(d3.select('#mainBox').attr('width')) + 10, Number(i + 10), Number(i +10));
       i += xVal;
       lineNum --;
     }
-}
+};
 
 let addLine = function (x1, x2, y1, y2,) {
     let dashed = '0,0';
@@ -68,8 +74,31 @@ let addLine = function (x1, x2, y1, y2,) {
         .style('stroke', 'black')
         .style('stroke-width', stroke);
 };
+
+let fillBox = function(width, height, colour, opacity) {
+    d3.select('#mainCanvas').append('rect')
+      .attr('x', 10)
+      .attr('y', 10)
+      .attr('width', 0)
+      .attr('height', height)
+      .style('fill', colour)
+      .style('opacity', opacity)
+      .transition().delay(function (d, i) {
+        return i * 300;
+      }).duration(500)
+        .attr('width', width);
+        // .attr('height', height);
+};
+
 verticalDivide(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator), Number(leftOpperand.denominator - 1));
 horizontalDivide(Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator), Number(rightOpperand.denominator - 1));
+document.getElementById('clickMe').onclick = function() {
+  fillBox(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator) * leftOpperand.numerator, Number(d3.select('#mainBox').attr('height')), leftOpperand.colour, 1);
+};
+
+document.getElementById('clickMe2').onclick = function() {
+  fillBox(Number(d3.select('#mainBox').attr('width')), Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator) * rightOpperand.numerator, rightOpperand.colour, 0.5);
+};
 
 </script>
 </body>
