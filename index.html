@@ -4,14 +4,44 @@
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <meta charset="UTF-8">
     <title>Fraction Multiplication</title>
-    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script> -->
-    <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous"> -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+    </script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <style>
+      .fractionInput {
+          max-width: 40px;
+      }
 
+      .fractionBar {
+          width: 40px;
+          height: 3px;
+          background-color: #000000;
+      }
     </style>
 </head>
 <body>
-  <div class="canvasDiv" style="float: left">
+
+  <div class="fractionInputs" style="margin:20px">
+    <div style="float: left">
+        <input type="text" class="fractionInput form-control form-control-sm" id="lOppNumerator" placeholder="0" style="margin-bottom: -10px; display: none">
+        <hr align="left" class="fractionBar" style="display: none">
+        <input type="text" class="fractionInput form-control form-control-sm" id="lOppDenominator" placeholder="1" style="display: none">
+        <h1 id="inputFractionText" style="display: block">$\frac{2}{3} \times$</h1>
+    </div>
+    <div style="float: left; display: block">
+        <input type="text" class="fractionInput form-control form-control-sm" id="lOppNumerator" placeholder="0" style="margin-bottom: -10px">
+        <hr align="left" class="fractionBar">
+        <input type="text" class="fractionInput form-control form-control-sm" id="lOppDenominator" placeholder="1">
+    </div>
+    <button type="button" id="continueBtn" class="btn btn-primary buttons" style="margin: 30px">Continue</button>
+
+  </div>
+
+  <div class="canvasDiv" style="clear: left">
     <svg height="600" width="600" mlns="http://www.w3.org/2000/svg" id="mainCanvas" style="float: left">
       <rect id="mainBox" height="480" width="480" x="10" y="10" style="outline: solid #000000 3px; fill:#ffffff"></rect>
       <rect id="leftOpperand" height="480" width="0" x="10" y="10"></rect>
@@ -20,14 +50,11 @@
 
   </div>
   <div>
-    <h1 id="clickMe">hello</h1>
-    <h1 id="clickMe2">hello</h1>
+    <h1 id="clickMe">$\frac{2}{3}$</h1>
+    <h1 id="clickMe2">3/5</h1>
     <h1 id="clickMe3">combine</h1>
-    <svg height="600" width="600" mlns="http://www.w3.org/2000/svg" id="Canvas" style="float: left">
-      <rect id="mainBox" height="150" width="180" x="10" y="10" style="fill:#ff0066"></rect>
-      <rect id="mainBox" height="150" width="180" x="100" y="10" style="fill:#0000ff; opacity: 0.5"></rect>
+    <button type="button" id="resetBtn" class="btn btn-primary buttons">Reset</button>
 
-    </svg>
   </div>
 
 
@@ -103,6 +130,17 @@ let changeOpacity = function(box, opacity) {
     .style('opacity', opacity);
 };
 
+let resetInputs = function() {
+    d3.selectAll('.divLine').remove();
+    d3.select('#leftOpperand').attr('width', 0);
+    d3.select('#rightOpperand').attr('height', 0);
+    leftOpperand.numerator = Number(0);
+    leftOpperand.denominator = Number(0);
+    rightOpperand.numerator = Number(0);
+    rightOpperand.denominator = Number(0);
+
+};
+
 document.getElementById('clickMe').onclick = function() {
   verticalDivide(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator), Number(leftOpperand.denominator - 1));
   fillBox(leftOpperand, Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator) * leftOpperand.numerator, Number(d3.select('#mainBox').attr('height')), leftOpperand.colour, 1);
@@ -116,7 +154,12 @@ document.getElementById('clickMe2').onclick = function() {
 
 document.getElementById('clickMe3').onclick = function() {
   changeOpacity(leftOpperand, 1);
+  d3.select('#inputFractionText').text("$\\frac" +"{2}{3}" + "\\times$");
 };
+
+document.getElementById('resetBtn').onclick = function() {
+  resetInputs();
+}
 
 </script>
 </body>
