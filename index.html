@@ -14,12 +14,15 @@
   <div class="canvasDiv" style="float: left">
     <svg height="600" width="600" mlns="http://www.w3.org/2000/svg" id="mainCanvas" style="float: left">
       <rect id="mainBox" height="480" width="480" x="10" y="10" style="outline: solid #000000 3px; fill:#ffffff"></rect>
+      <rect id="leftOpperand" height="480" width="0" x="10" y="10"></rect>
+      <rect id="rightOpperand" height="0" width="480" x="10" y="10"></rect>
     </svg>
 
   </div>
   <div>
     <h1 id="clickMe">hello</h1>
     <h1 id="clickMe2">hello</h1>
+    <h1 id="clickMe3">combine</h1>
     <svg height="600" width="600" mlns="http://www.w3.org/2000/svg" id="Canvas" style="float: left">
       <rect id="mainBox" height="150" width="180" x="10" y="10" style="fill:#ff0066"></rect>
       <rect id="mainBox" height="150" width="180" x="100" y="10" style="fill:#0000ff; opacity: 0.5"></rect>
@@ -31,12 +34,14 @@
 <script>
 
 let leftOpperand = {
+    id: 'leftOpperand',
     numerator: Number(2),
     denominator: Number(5),
     colour: '#ff0066'
 };
 
 let rightOpperand = {
+    id: 'rightOpperand',
     numerator: Number(3),
     denominator: Number(5),
     colour: '#0000ff'
@@ -62,11 +67,10 @@ let horizontalDivide = function(xVal, lineNum) {
 
 let addLine = function (x1, x2, y1, y2,) {
     let dashed = '0,0';
-    let name = '';
     let stroke = 2;
 
     d3.select('#mainCanvas').append('line')
-        .attr('class', 'divLine ' + name)
+        .attr('class', 'divLine ')
         .attr('x1', x1)
         .attr('x2', x2)
         .attr('y1', y1)
@@ -75,29 +79,43 @@ let addLine = function (x1, x2, y1, y2,) {
         .style('stroke-width', stroke);
 };
 
-let fillBox = function(width, height, colour, opacity) {
-    d3.select('#mainCanvas').append('rect')
-      .attr('x', 10)
-      .attr('y', 10)
-      .attr('width', 0)
-      .attr('height', height)
-      .style('fill', colour)
-      .style('opacity', opacity)
-      .transition().delay(function (d, i) {
+let fillBox = function(box, width, height, colour, opacity) {
+    console.log(box.id);
+    d3.select('#' + box.id)
+    .style('fill', colour)
+    .style('opacity', opacity)
+    .transition().delay(function (d, i) {
         return i * 300;
       }).duration(500)
-        .attr('width', width);
-        // .attr('height', height);
+        .attr('width', width)
+        .attr('height', height);
 };
 
-verticalDivide(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator), Number(leftOpperand.denominator - 1));
-horizontalDivide(Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator), Number(rightOpperand.denominator - 1));
+let changeOpacity = function(box, opacity) {
+    d3.select('#' + box.id).transition().delay(function (d, i) {
+        return i * 300;
+      }).duration(500)
+        .style('opacity', opacity);
+
+    d3.selectAll('.divLine').transition().delay(function (d, i) {
+        return i * 100;
+      }).duration(200)
+    .style('opacity', opacity);
+};
+
 document.getElementById('clickMe').onclick = function() {
-  fillBox(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator) * leftOpperand.numerator, Number(d3.select('#mainBox').attr('height')), leftOpperand.colour, 1);
+  verticalDivide(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator), Number(leftOpperand.denominator - 1));
+  fillBox(leftOpperand, Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator) * leftOpperand.numerator, Number(d3.select('#mainBox').attr('height')), leftOpperand.colour, 1);
 };
 
 document.getElementById('clickMe2').onclick = function() {
-  fillBox(Number(d3.select('#mainBox').attr('width')), Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator) * rightOpperand.numerator, rightOpperand.colour, 0.5);
+  changeOpacity(leftOpperand, 0);
+  horizontalDivide(Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator), Number(rightOpperand.denominator - 1));
+  fillBox(rightOpperand, Number(d3.select('#mainBox').attr('width')), Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator) * rightOpperand.numerator, rightOpperand.colour, 0.5);
+};
+
+document.getElementById('clickMe3').onclick = function() {
+  changeOpacity(leftOpperand, 1);
 };
 
 </script>
