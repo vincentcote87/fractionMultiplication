@@ -4,13 +4,14 @@
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <meta charset="UTF-8">
     <title>Fraction Multiplication</title>
-    <script type="text/x-mathjax-config">
+    <!-- <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
           tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
         });
-    </script>
+    </script> -->
     <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <style>
       .fractionInput {
           max-width: 40px;
@@ -54,9 +55,6 @@
     <h1 id="clickMe2">3/5</h1>
     <h1 id="clickMe3">combine</h1>
     <button type="button" id="resetBtn" class="btn btn-primary buttons">Reset</button>
-
-  </div>
-
 
 <script>
 
@@ -141,6 +139,19 @@ let resetInputs = function() {
 
 };
 
+//***************************MOVE TO FRACTION ADDITION*********************************
+function isScrolledIntoView(elem)
+{
+    var docViewTop = $(window).scrollTop();
+    var docViewBottom = docViewTop + $(window).height();
+
+    var elemTop = $(elem).offset().top;
+    var elemBottom = elemTop + $(elem).height();
+
+    return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+};
+//*************************************************************************************
+
 document.getElementById('clickMe').onclick = function() {
   verticalDivide(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator), Number(leftOpperand.denominator - 1));
   fillBox(leftOpperand, Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator) * leftOpperand.numerator, Number(d3.select('#mainBox').attr('height')), leftOpperand.colour, 1);
@@ -154,12 +165,21 @@ document.getElementById('clickMe2').onclick = function() {
 
 document.getElementById('clickMe3').onclick = function() {
   changeOpacity(leftOpperand, 1);
-  d3.select('#inputFractionText').text("$\\frac" +"{2}{3}" + "\\times$");
+  // d3.select('#inputFractionText').text("$\\frac" +"{2}{3}" + "\\times$");
+    d3.select('#inputFractionText').text("$\\frac" +"{2}{3}" + "\\times$")
+    .each(function () {
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.src  = "https://example.com/MathJax.js?config=TeX-AMS-MML_CHTML";
+  document.getElementsByTagName("head")[0].appendChild(script);
+});
+
 };
 
 document.getElementById('resetBtn').onclick = function() {
   resetInputs();
 }
+
 
 </script>
 </body>
