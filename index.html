@@ -4,11 +4,11 @@
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <meta charset="UTF-8">
     <title>Fraction Multiplication</title>
-    <!-- <script type="text/x-mathjax-config">
+    <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
           tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
         });
-    </script> -->
+    </script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
@@ -27,17 +27,18 @@
 <body>
 
   <div class="fractionInputs" style="margin:20px">
-    <div style="float: left">
-        <input type="text" class="fractionInput form-control form-control-sm" id="lOppNumerator" placeholder="0" style="margin-bottom: -10px; display: none">
-        <hr align="left" class="fractionBar" style="display: none">
-        <input type="text" class="fractionInput form-control form-control-sm" id="lOppDenominator" placeholder="1" style="display: none">
-        <h1 id="inputFractionText" style="display: block">$\frac{2}{3} \times$</h1>
+    <h1 id="leftInputFractionText" style="float: left; display: none"></h1>
+    <h1 id="rightInputFractionText" style="float: left; display: none"></h1>
+    <div id="opperandInput" style="float: left; display: block">
+        <input type="text" class="fractionInput form-control form-control-sm" id="oppNumerator" placeholder="0" style="margin-bottom: -10px;">
+        <hr align="left" class="fractionBar">
+        <input type="text" class="fractionInput form-control form-control-sm" id="oppDenominator" placeholder="1" style="margin-top: -10px;">
     </div>
-    <div style="float: left; display: block">
+    <!-- <div style="float: left; display: none">
         <input type="text" class="fractionInput form-control form-control-sm" id="lOppNumerator" placeholder="0" style="margin-bottom: -10px">
         <hr align="left" class="fractionBar">
         <input type="text" class="fractionInput form-control form-control-sm" id="lOppDenominator" placeholder="1">
-    </div>
+    </div> -->
     <button type="button" id="continueBtn" class="btn btn-primary buttons" style="margin: 30px">Continue</button>
 
   </div>
@@ -51,26 +52,31 @@
 
   </div>
   <div>
-    <h1 id="clickMe">$\frac{2}{3}$</h1>
-    <h1 id="clickMe2">3/5</h1>
-    <h1 id="clickMe3">combine</h1>
     <button type="button" id="resetBtn" class="btn btn-primary buttons">Reset</button>
 
 <script>
 
 let leftOpperand = {
     id: 'leftOpperand',
-    numerator: Number(2),
-    denominator: Number(5),
+    numerator: Number(0),
+    denominator: Number(0),
     colour: '#ff0066'
 };
 
 let rightOpperand = {
     id: 'rightOpperand',
-    numerator: Number(3),
-    denominator: Number(5),
+    numerator: Number(0),
+    denominator: Number(0),
     colour: '#0000ff'
 };
+
+let currentState = 0;
+
+let getOpperandInput = function(numeratorInput, denominatorInput, opperand) {
+  opperand.numerator = document.getElementById(numeratorInput).value;
+  opperand.denominator = document.getElementById(denominatorInput).value;
+
+}
 
 let verticalDivide = function(xVal, lineNum) {
     var i = xVal;
@@ -105,7 +111,6 @@ let addLine = function (x1, x2, y1, y2,) {
 };
 
 let fillBox = function(box, width, height, colour, opacity) {
-    console.log(box.id);
     d3.select('#' + box.id)
     .style('fill', colour)
     .style('opacity', opacity)
@@ -129,9 +134,14 @@ let changeOpacity = function(box, opacity) {
 };
 
 let resetInputs = function() {
+    d3.select('#continueBtn').attr('disabled', null);
     d3.selectAll('.divLine').remove();
     d3.select('#leftOpperand').attr('width', 0);
     d3.select('#rightOpperand').attr('height', 0);
+    d3.select('#leftInputFractionText').text('').style('display', 'none');
+    d3.select('#rightInputFractionText').text('').style('display', 'none');
+    clearInput('oppNumerator');
+    clearInput('oppDenominator');
     leftOpperand.numerator = Number(0);
     leftOpperand.denominator = Number(0);
     rightOpperand.numerator = Number(0);
@@ -139,45 +149,98 @@ let resetInputs = function() {
 
 };
 
-//***************************MOVE TO FRACTION ADDITION*********************************
-function isScrolledIntoView(elem)
-{
-    var docViewTop = $(window).scrollTop();
-    var docViewBottom = docViewTop + $(window).height();
-
-    var elemTop = $(elem).offset().top;
-    var elemBottom = elemTop + $(elem).height();
-
-    return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
-};
-//*************************************************************************************
-
-document.getElementById('clickMe').onclick = function() {
-  verticalDivide(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator), Number(leftOpperand.denominator - 1));
-  fillBox(leftOpperand, Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator) * leftOpperand.numerator, Number(d3.select('#mainBox').attr('height')), leftOpperand.colour, 1);
+let isValid = function(numerator, denominator) {
+  console.log(numerator);
+  console.log(denominator);
+  if (numerator < 0 || numerator > 12) {
+    return false;
+  }
+  if (denominator <= 0 || denominator > 12) {
+    return false;
+  }
+  return (numerator < denominator);
 };
 
-document.getElementById('clickMe2').onclick = function() {
-  changeOpacity(leftOpperand, 0);
-  horizontalDivide(Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator), Number(rightOpperand.denominator - 1));
-  fillBox(rightOpperand, Number(d3.select('#mainBox').attr('width')), Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator) * rightOpperand.numerator, rightOpperand.colour, 0.5);
+let updateMathJax = function() {
+  MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 };
 
-document.getElementById('clickMe3').onclick = function() {
-  changeOpacity(leftOpperand, 1);
-  // d3.select('#inputFractionText').text("$\\frac" +"{2}{3}" + "\\times$");
-    d3.select('#inputFractionText').text("$\\frac" +"{2}{3}" + "\\times$")
-    .each(function () {
-  var script = document.createElement("script");
-  script.type = "text/javascript";
-  script.src  = "https://example.com/MathJax.js?config=TeX-AMS-MML_CHTML";
-  document.getElementsByTagName("head")[0].appendChild(script);
-});
-
+let showInputBox = function(inputId) {
+  d3.select('#' + inputId).style('display', 'block');
 };
+
+let hideInputBox = function(inputId) {
+  d3.select('#' + inputId).style('display', 'none');
+};
+
+let clearInput = function(inputId) {
+  document.getElementById(inputId).value = '';
+}
+
+let stateControler = function(state) {
+  currentState = state;
+
+  switch(state) {
+    case 0 :
+      console.log('state 0');
+      resetInputs();
+      showInputBox('opperandInput');
+      break;
+    case 1 :
+      console.log('state 1');
+      getOpperandInput('oppNumerator', 'oppDenominator', leftOpperand);
+      d3.select('#leftInputFractionText')
+        .text('$\\frac{'+leftOpperand.numerator+'}{'+leftOpperand.denominator+'} \\times$')
+        .style('display', 'block');
+      updateMathJax();
+      verticalDivide(Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator), Number(leftOpperand.denominator - 1));
+      hideInputBox('opperandInput');
+      break;
+    case 2 :
+      console.log('state 2');
+      fillBox(leftOpperand, Number(d3.select('#mainBox').attr('width')/leftOpperand.denominator) * leftOpperand.numerator, Number(d3.select('#mainBox').attr('height')), leftOpperand.colour, 1);
+      clearInput('oppNumerator');
+      clearInput('oppDenominator');
+      showInputBox('opperandInput');
+      break;
+    case 3 :
+      console.log('state 3');
+      getOpperandInput('oppNumerator', 'oppDenominator', rightOpperand);
+      d3.select('#rightInputFractionText')
+        .text('$\\frac{'+rightOpperand.numerator+'}{'+rightOpperand.denominator+'}$')
+        .style('display', 'block');
+      updateMathJax();
+      changeOpacity(leftOpperand, 0);
+      horizontalDivide(Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator), Number(rightOpperand.denominator - 1));
+      hideInputBox('opperandInput');
+      break;
+    case 4 :
+      console.log('state 4');
+      fillBox(rightOpperand, Number(d3.select('#mainBox').attr('width')), Number(d3.select('#mainBox').attr('height')/rightOpperand.denominator) * rightOpperand.numerator, rightOpperand.colour, 0.5);
+      break;
+    case 5 :
+      console.log('state 5');
+      changeOpacity(leftOpperand, 1);
+      d3.select('#continueBtn').attr('disabled', true);
+      break;
+    default:
+      console.log('not a valid of state, returning to state 0');
+      stateControler(0);
+  }
+};
+
+document.getElementById('continueBtn').onclick = function() {
+  if(!isValid(Number(document.getElementById('oppNumerator').value), Number(document.getElementById('oppDenominator').value))){
+      alert('Make sure your factions are proper and the denominators less then or equal to 12');
+  }
+  else {
+    stateControler(currentState + 1);
+  }
+}
 
 document.getElementById('resetBtn').onclick = function() {
   resetInputs();
+  stateControler(0);
 }
 
 
